@@ -18,40 +18,52 @@ public class StudentController : ControllerBase
     public async Task<IActionResult> GetAll()
     => Ok(await _unitOfWork.StudentRepository.GetAll());
 
-    [HttpPost("Add")]
-    public async Task<IActionResult> Add([FromBody] AddStudent addStudent)
+    [HttpGet("Get/{id}")]
+    public async Task<IActionResult> Get([FromRoute] Guid id)
     {
-        if (string.IsNullOrWhiteSpace(addStudent.NationalCode))
+        Models.DomainModels.Student? result =
+            await _unitOfWork.StudentRepository.Get(id);
+
+        if (result == null)
+            return NotFound();
+        else
+            return Ok(result);
+    }
+
+    [HttpPost("Add")]
+    public async Task<IActionResult> Add([FromBody] RegisterStudent registerStudent)
+    {
+        if (string.IsNullOrWhiteSpace(registerStudent.NationalCode))
             return BadRequest("کد ملی را وارد کنید");
 
-        if (addStudent.NationalCode?.Length != 10)
+        if (registerStudent.NationalCode?.Length != 10)
             return BadRequest("کد ملی صحیح نیست");
 
-        if (string.IsNullOrWhiteSpace(addStudent.NationalCode))
+        if (string.IsNullOrWhiteSpace(registerStudent.NationalCode))
             return BadRequest("کد ملی را وارد کنید");
 
-        if (string.IsNullOrWhiteSpace(addStudent.FirstName))
+        if (string.IsNullOrWhiteSpace(registerStudent.FirstName))
             return BadRequest("نام را وارد کنید");
 
-        if (string.IsNullOrWhiteSpace(addStudent.LastName))
+        if (string.IsNullOrWhiteSpace(registerStudent.LastName))
             return BadRequest("نام فامیلی را وارد کنید");
 
-        if (string.IsNullOrWhiteSpace(addStudent.Email))
+        if (string.IsNullOrWhiteSpace(registerStudent.Email))
             return BadRequest("ایمیل را وارد کنید");
 
-        if (!Regex.IsMatch(addStudent.Email, @"^([\w-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([\w-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$"))
+        if (!Regex.IsMatch(registerStudent.Email, @"^([\w-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([\w-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$"))
             return BadRequest("فرمت ایمیل معتبر نیست");
 
-        if (string.IsNullOrWhiteSpace(addStudent.Phone))
+        if (string.IsNullOrWhiteSpace(registerStudent.Phone))
             return BadRequest("شماره تلفن را وارد کنید");
 
-        if (!Regex.IsMatch(addStudent.Phone, @"^(?:0|98|\+98|\+980|0098|098|00980)?(9\d{9})$"))
+        if (!Regex.IsMatch(registerStudent.Phone, @"^(?:0|98|\+98|\+980|0098|098|00980)?(9\d{9})$"))
             return BadRequest("شماره تلفن صحیح نیست");
 
-        if (addStudent.AddAddresses == null || addStudent.AddAddresses.Count >= 0)
+        if (registerStudent.RegisterAddress == null || registerStudent.RegisterAddress.Count >= 0)
             return BadRequest("آدرس را وارد کنید");
 
-        List<Models.DomainModels.Address> addresses = addStudent.AddAddresses
+        List<Models.DomainModels.Address> addresses = registerStudent.RegisterAddress
             .Select(o => new Models.DomainModels.Address(
                 Guid.NewGuid(),
                 o.Name,
@@ -63,12 +75,12 @@ public class StudentController : ControllerBase
 
         var student = new Models.DomainModels.Student()
         {
-            FirstName = addStudent.FirstName,
-            LastName = addStudent.LastName,
-            Email = addStudent.Email,
-            Gender = addStudent.Gender,
-            NationalCode = addStudent.NationalCode,
-            Phone = addStudent.Phone,
+            FirstName = registerStudent.FirstName,
+            LastName = registerStudent.LastName,
+            Email = registerStudent.Email,
+            Gender = registerStudent.Gender,
+            NationalCode = registerStudent.NationalCode,
+            Phone = registerStudent.Phone,
             Id = Guid.NewGuid(),
             Addresses = addresses
         };
@@ -76,6 +88,23 @@ public class StudentController : ControllerBase
         await _unitOfWork.StudentRepository.Add(student);
 
         _unitOfWork.Complete();
+
+        return Ok();
+    }
+
+    [HttpDelete("Delete/{id}")]
+    public async Task<ActionResult> Delete([FromRoute] Guid id)
+    {
+        Models.DomainModels.Student? result =
+            await _unitOfWork.StudentRepository.Get(id);
+
+        if (result == null)
+            return NotFound();
+        else
+            _unitOfWork.StudentRepository.Delete(result);
+
+        _unitOfWork.Complete();
+
         return Ok();
     }
 }

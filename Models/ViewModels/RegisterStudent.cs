@@ -2,7 +2,7 @@
 
 namespace Models.ViewModels
 {
-    public class AddStudent
+    public class RegisterStudent
     {
         public string? FirstName { get; set; }
         public string? LastName { get; set; }
@@ -11,6 +11,6 @@ namespace Models.ViewModels
         public string? Phone { get; set; }
         public string? Email { get; set; }
 
-        public ICollection<AddAddress> AddAddresses { get; set; }
+        public ICollection<RegisterAddress>? RegisterAddress { get; set; }
     }
 }

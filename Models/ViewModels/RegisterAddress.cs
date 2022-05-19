@@ -1,6 +1,6 @@
 ﻿namespace Models.ViewModels;
 
-public class AddAddress
+public class RegisterAddress
 {
     public string? Name { get; set; }
     public string? PostalCode { get; set; }
