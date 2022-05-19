@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Models.Context;
-
+using Models.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 ConfigurationManager configuration = builder.Configuration;
@@ -14,6 +14,11 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddDbContext<FluentValidationDbContext>(options
     => options.UseSqlServer(configuration.GetConnectionString("FluentValidationDatabase")));
+
+builder.Services.AddScoped<IStudentRepository, StudentRepository>();
+builder.Services.AddScoped<ICourseRepository, CourseRepository>();
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+
 
 var app = builder.Build();
 

@@ -20,4 +20,10 @@
     </PackageReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="ValueObjects\" />
+    <Folder Include="Validator\" />
+    <Folder Include="ViewModels\" />
+  </ItemGroup>
+
 </Project>

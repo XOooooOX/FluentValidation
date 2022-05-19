@@ -1,5 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using Models.Repositories;
 
 namespace FluentValidation.Controllers;
 
@@ -7,5 +7,11 @@ namespace FluentValidation.Controllers;
 [ApiController]
 public class StudentController : ControllerBase
 {
+    private IUnitOfWork _unitOfWork;
+
+    public StudentController(IUnitOfWork unitOfWork)
+    {
+        _unitOfWork = unitOfWork;
+    }
 }
 
