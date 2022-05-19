@@ -9,7 +9,7 @@ using Models.Context;
 
 #nullable disable
 
-namespace Models.Context
+namespace Models.Context.Migrations
 {
     [DbContext(typeof(FluentValidationDbContext))]
     [Migration("20220519090950_InitialCreate")]

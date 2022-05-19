@@ -8,7 +8,7 @@ using Models.Context;
 
 #nullable disable
 
-namespace Models.Context
+namespace Models.Context.Migrations
 {
     [DbContext(typeof(FluentValidationDbContext))]
     partial class FluentValidationDbContextModelSnapshot : ModelSnapshot
@@ -58,6 +58,9 @@ namespace Models.Context
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
