@@ -10,8 +10,10 @@ public class CourseController : ControllerBase
     private IUnitOfWork _unitOfWork;
 
     public CourseController(IUnitOfWork unitOfWork)
-    {
-        _unitOfWork = unitOfWork;
-    }
+        => _unitOfWork = unitOfWork;
+
+    [HttpGet("GetAll")]
+    public async Task<IActionResult> GetAll()
+        => Ok(await _unitOfWork.CourseRepository.GetAll());
 }
 

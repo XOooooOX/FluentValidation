@@ -2,10 +2,10 @@
 
 public class Address
 {
-    public Address(Guid id, string name, string postalCode, Student student,
-        string city, string state, string completeAddress, Guid studentId)
-        => (Id, Name, PostalCode, City, State, CompleteAddress, StudentId, Student)
-        = (id, name, postalCode, city, state, completeAddress, studentId, student);
+    public Address(Guid id, string name, string postalCode,
+        string city, string state, string completeAddress)
+        => (Id, Name, PostalCode, City, State, CompleteAddress)
+        = (id, name, postalCode, city, state, completeAddress);
 
     public Address()
         => Student = new Student();

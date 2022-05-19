@@ -24,11 +24,3 @@ public class Student
     public ICollection<Address> Addresses { get; set; }
     public ICollection<StudentCourse> StudentCourses { get; set; }
 }
-
-public enum Gender
-{
-    Male = 1,
-    Female,
-    Unspecified
-}
-
