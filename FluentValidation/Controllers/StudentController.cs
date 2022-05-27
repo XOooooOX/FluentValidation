@@ -3,6 +3,7 @@ using Models.Repositories;
 using Models.Validator;
 using Models.ViewModels;
 using System.Text.RegularExpressions;
+using FluentValidation;
 
 namespace FluentValidationApp.Controllers;
 
@@ -35,12 +36,15 @@ public class StudentController : ControllerBase
     public async Task<IActionResult> Add([FromBody] RegisterStudent registerStudent)
     {
         var validator = new RegisterStudentValidator();
-        var result =await validator.ValidateAsync(registerStudent);
+
+        var result = await validator.ValidateAsync(registerStudent, o =>
+            o.IncludeRuleSets(Models.ActionCrud.Add.ToString())
+        );
 
         if (!result.IsValid)
             return BadRequest(result.Errors[0].ErrorMessage);
-        
-        
+
+
         //if (string.IsNullOrWhiteSpace(registerStudent.NationalCode))
         //    return BadRequest("کد ملی را وارد کنید");
 
@@ -56,7 +60,7 @@ public class StudentController : ControllerBase
         //if (string.IsNullOrWhiteSpace(registerStudent.Email))
         //    return BadRequest("ایمیل را وارد کنید");
 
-        //if (!Regex.IsMatch(registerStudent.Email, @"^([\w-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([\w-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$"))
+        //if (!Regex.IsMatch(registerStudent.Email, @"^0(9\d{9})$"))
         //    return BadRequest("فرمت ایمیل معتبر نیست");
 
         //if (string.IsNullOrWhiteSpace(registerStudent.Phone))

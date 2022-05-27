@@ -7,6 +7,11 @@ public class RegisterStudentValidator : AbstractValidator<RegisterStudent>
 {
     public RegisterStudentValidator()
     {
+        RuleSet(ActionCrud.Add.ToString(), () =>
+        {
+            RuleFor(o => o.Phone).NotEmpty().Matches(@"^0(9\d{9})$");
+        });
+
         RuleFor(o => o.NationalCode)
             .NotNull().WithMessage("لطفا کد ملی را وارد کنید")
             .Length(10).WithMessage("تعداد کاراکترها صحیح نیست");
@@ -14,7 +19,8 @@ public class RegisterStudentValidator : AbstractValidator<RegisterStudent>
         RuleFor(o => o.FirstName)
             .NotEmpty();
 
-        RuleFor(o => o.RegisterAddress).NotNull();
+        RuleFor(o => o.RegisterAddress).NotNull()
+            .Must(o=> o?.Count > 0 && o.Count <=2);
 
         RuleForEach(o => o.RegisterAddress)
             .SetValidator(new RegisterAddressValidator());
