@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Models.Repositories;
 
-namespace FluentValidation.Controllers;
+namespace FluentValidationApp.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]

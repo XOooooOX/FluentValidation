@@ -20,6 +20,7 @@ public class Student
     public Gender Gender { get; set; }
     public string? Phone { get; set; }
     public string? Email { get; set; }
+    public int Age { get; set; }
 
     public ICollection<Address> Addresses { get; set; }
     public ICollection<StudentCourse> StudentCourses { get; set; }

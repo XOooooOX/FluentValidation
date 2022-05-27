@@ -1,9 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Models.Repositories;
+using Models.Validator;
 using Models.ViewModels;
 using System.Text.RegularExpressions;
 
-namespace FluentValidation.Controllers;
+namespace FluentValidationApp.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
@@ -33,35 +34,39 @@ public class StudentController : ControllerBase
     [HttpPost("Add")]
     public async Task<IActionResult> Add([FromBody] RegisterStudent registerStudent)
     {
-        if (string.IsNullOrWhiteSpace(registerStudent.NationalCode))
-            return BadRequest("کد ملی را وارد کنید");
+        var validator = new RegisterStudentValidator();
+        var result =await validator.ValidateAsync(registerStudent);
 
-        if (registerStudent.NationalCode?.Length != 10)
-            return BadRequest("کد ملی صحیح نیست");
+        if (!result.IsValid)
+            return BadRequest(result.Errors[0].ErrorMessage);
+        
+        
+        //if (string.IsNullOrWhiteSpace(registerStudent.NationalCode))
+        //    return BadRequest("کد ملی را وارد کنید");
 
-        if (string.IsNullOrWhiteSpace(registerStudent.NationalCode))
-            return BadRequest("کد ملی را وارد کنید");
+        //if (registerStudent.NationalCode?.Length != 10)
+        //    return BadRequest("کد ملی صحیح نیست");
 
-        if (string.IsNullOrWhiteSpace(registerStudent.FirstName))
-            return BadRequest("نام را وارد کنید");
+        //if (string.IsNullOrWhiteSpace(registerStudent.FirstName))
+        //    return BadRequest("نام را وارد کنید");
 
-        if (string.IsNullOrWhiteSpace(registerStudent.LastName))
-            return BadRequest("نام فامیلی را وارد کنید");
+        //if (string.IsNullOrWhiteSpace(registerStudent.LastName))
+        //    return BadRequest("نام فامیلی را وارد کنید");
 
-        if (string.IsNullOrWhiteSpace(registerStudent.Email))
-            return BadRequest("ایمیل را وارد کنید");
+        //if (string.IsNullOrWhiteSpace(registerStudent.Email))
+        //    return BadRequest("ایمیل را وارد کنید");
 
-        if (!Regex.IsMatch(registerStudent.Email, @"^([\w-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([\w-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$"))
-            return BadRequest("فرمت ایمیل معتبر نیست");
+        //if (!Regex.IsMatch(registerStudent.Email, @"^([\w-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([\w-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$"))
+        //    return BadRequest("فرمت ایمیل معتبر نیست");
 
-        if (string.IsNullOrWhiteSpace(registerStudent.Phone))
-            return BadRequest("شماره تلفن را وارد کنید");
+        //if (string.IsNullOrWhiteSpace(registerStudent.Phone))
+        //    return BadRequest("شماره تلفن را وارد کنید");
 
-        if (!Regex.IsMatch(registerStudent.Phone, @"^(?:0|98|\+98|\+980|0098|098|00980)?(9\d{9})$"))
-            return BadRequest("شماره تلفن صحیح نیست");
+        //if (!Regex.IsMatch(registerStudent.Phone, @"^(?:0|98|\+98|\+980|0098|098|00980)?(9\d{9})$"))
+        //    return BadRequest("شماره تلفن صحیح نیست");
 
-        if (registerStudent.RegisterAddress == null || registerStudent.RegisterAddress.Count >= 0)
-            return BadRequest("آدرس را وارد کنید");
+        //if (registerStudent.RegisterAddress == null || registerStudent.RegisterAddress.Count <= 0)
+        //    return BadRequest("آدرس را وارد کنید");
 
         List<Models.DomainModels.Address> addresses = registerStudent.RegisterAddress
             .Select(o => new Models.DomainModels.Address(
@@ -81,6 +86,7 @@ public class StudentController : ControllerBase
             Gender = registerStudent.Gender,
             NationalCode = registerStudent.NationalCode,
             Phone = registerStudent.Phone,
+            Age = registerStudent.Age,
             Id = Guid.NewGuid(),
             Addresses = addresses
         };
