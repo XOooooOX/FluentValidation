@@ -7,14 +7,18 @@ public class RegisterStudentValidator : AbstractValidator<RegisterStudent>
 {
     public RegisterStudentValidator()
     {
-        RuleSet(ActionCrud.Add.ToString(), () =>
-        {
-            RuleFor(o => o.Phone).NotEmpty().Matches(@"^0(9\d{9})$");
-        });
+        //RuleSet(ActionCrud.Add.ToString(), () =>
+        //{
+        //    //RuleFor(o => o.Phone).NotEmpty().Matches(@"^0(9\d{9})$");
+        //});
 
-        RuleFor(o => o.NationalCode)
+        //CascadeMode = CascadeMode.Stop;
+
+        RuleFor(o => o.NationalCode)/*.Cascade(CascadeMode.Stop)*/
             .NotNull().WithMessage("لطفا کد ملی را وارد کنید")
-            .Length(10).WithMessage("تعداد کاراکترها صحیح نیست");
+            .Length(10).WithMessage("تعداد کاراکترها صحیح نیست")
+            .Equal("test");
+
 
         RuleFor(o => o.FirstName)
             .NotEmpty();
@@ -25,13 +29,27 @@ public class RegisterStudentValidator : AbstractValidator<RegisterStudent>
         RuleForEach(o => o.RegisterAddress)
             .SetValidator(new RegisterAddressValidator());
 
-        RuleFor(o => o.Email)
-            .NotEmpty()
-            .EmailAddress();
+        //RuleFor(o => o.Email)
+        //    .NotEmpty()
+        //    .EmailAddress();
 
         RuleFor(o => o.Age)
             .GreaterThan(18)
             .LessThan(40);
+
+
+        When(o => !string.IsNullOrEmpty(o.Phone), () =>
+        {
+            RuleFor(o => o.Phone).NotEmpty().Matches(@"^0(9\d{9})$");
+
+            RuleFor(o => o.Email).Null();
+
+        }).Otherwise(() =>
+        {
+            RuleFor(o => o.Email).NotEmpty().EmailAddress();
+
+            RuleFor(o => o.Phone).Null();
+        });
 
     }
 }

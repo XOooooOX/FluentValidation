@@ -19,6 +19,8 @@ builder.Services.AddScoped<IStudentRepository, StudentRepository>();
 builder.Services.AddScoped<ICourseRepository, CourseRepository>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
+//FluentValidation.ValidatorOptions.Global.CascadeMode = FluentValidation.CascadeMode.Stop;
+
 
 var app = builder.Build();
 
