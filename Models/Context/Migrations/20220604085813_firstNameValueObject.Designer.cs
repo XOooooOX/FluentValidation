@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Models.Context;
 
@@ -11,9 +12,10 @@ using Models.Context;
 namespace Models.Context.Migrations
 {
     [DbContext(typeof(FluentValidationDbContext))]
-    partial class FluentValidationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220604085813_firstNameValueObject")]
+    partial class firstNameValueObject
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -134,8 +136,7 @@ namespace Models.Context.Migrations
 
                             b1.Property<string>("Value")
                                 .IsRequired()
-                                .HasColumnType("nvarchar(max)")
-                                .HasColumnName("FirstName");
+                                .HasColumnType("nvarchar(max)");
 
                             b1.HasKey("StudentId");
 

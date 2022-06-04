@@ -27,8 +27,8 @@ public class RegisterStudentValidator : AbstractValidator<RegisterStudent>
         //    .Must(o => o != null && o.StartsWith("h") && o.EndsWith("a"))
         //    .NotEmpty();
 
-        RuleFor(o => o.FirstName)
-            .StartAndEndControl("h", "a");
+        //RuleFor(o => o.FirstName)
+        //    .StartAndEndControl("h", "a");
 
         RuleFor(o => o.LastName)
             .StartAndEndControl("z", "b");

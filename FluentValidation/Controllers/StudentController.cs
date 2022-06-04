@@ -54,7 +54,7 @@ public class StudentController : ControllerBase
 
         var student = new Models.DomainModels.Student()
         {
-            FirstName = registerStudent.FirstName,
+            FirstName =new Models.DomainModels.FirstName( registerStudent.FirstName ?? ""),
             LastName = registerStudent.LastName,
             Email = registerStudent.Email,
             Gender = registerStudent.Gender,

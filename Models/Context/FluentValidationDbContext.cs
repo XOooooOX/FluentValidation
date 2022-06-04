@@ -11,6 +11,10 @@ public class FluentValidationDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<Student>()
+            .OwnsOne(o => o.FirstName,
+            x => x.Property(z => z.Value).HasColumnName("FirstName"));
+
         modelBuilder.Entity<StudentCourse>()
             .HasOne(o => o.Student)
             .WithMany(o => o.StudentCourses)
