@@ -50,7 +50,7 @@ public class RegisterStudentValidator : AbstractValidator<RegisterStudent>
             .LessThan(40);
 
         RuleFor(o => o.FirstName)
-            .NotEmpty()
+            .NotEmpty().WithMessage("لطفا نام را وارد کنید")
             .MustBeValueObject(FirstName.Create);
 
         When(o => !string.IsNullOrEmpty(o.Phone), () =>
