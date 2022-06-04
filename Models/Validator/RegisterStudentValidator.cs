@@ -1,4 +1,6 @@
-﻿using FluentValidation;
+﻿using CSharpFunctionalExtensions;
+using FluentValidation;
+using Models.DomainModels;
 using Models.ViewModels;
 
 namespace Models.Validator;
@@ -47,6 +49,9 @@ public class RegisterStudentValidator : AbstractValidator<RegisterStudent>
             .GreaterThan(18)
             .LessThan(40);
 
+        RuleFor(o => o.FirstName)
+            .NotEmpty()
+            .MustBeValueObject(FirstName.Create);
 
         When(o => !string.IsNullOrEmpty(o.Phone), () =>
         {
@@ -89,4 +94,21 @@ public static class CustomeValidator
             if (end != null && input != null && !input.EndsWith(end))
                 Context.AddFailure($"Must End With {end}, But You Enter {input[^1]}");
         });
+
+    public static IRuleBuilderOptions<T,string?>
+        MustBeValueObject<T,TValueObject>
+        (this IRuleBuilder<T,string?> ruleBuilder, Func<string,Result<TValueObject>> factoryMethod)
+        where TValueObject : ValueObject
+    {
+        return (IRuleBuilderOptions<T, string>)ruleBuilder.Custom((value, context) =>
+        {
+            if (string.IsNullOrWhiteSpace(value))
+                return;
+
+            Result<TValueObject> result = factoryMethod(value);
+
+            if (result.IsFailure)
+                context.AddFailure(result.Error);
+        });
+    }
 }

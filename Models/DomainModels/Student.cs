@@ -1,4 +1,5 @@
 ﻿using CSharpFunctionalExtensions;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Models.DomainModels;
 
@@ -34,8 +35,22 @@ public class FirstName : ValueObject
     public string Value { get; }
 
     private FirstName(string value)
+        => Value = value;
+
+    public static Result<FirstName> Create([MaybeNull]string? input)
     {
-        Value = value;
+        if (string.IsNullOrWhiteSpace(input))
+            return Result.Failure<FirstName>($"{nameof(FirstName)} must not be empty.");
+
+        string firstName = input.Trim();
+
+        if(firstName.Length < 5)
+            return Result.Failure<FirstName>($"{nameof(FirstName)} Must Be More Than 5 Character");
+
+        if (firstName.Length > 30)
+            return Result.Failure<FirstName>($"{nameof(FirstName)} Must Be Less Than 30 Character");
+
+        return Result.Success(new FirstName(firstName));
     }
 
     protected override IEnumerable<object> GetEqualityComponents()
