@@ -1,12 +1,24 @@
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using Microsoft.EntityFrameworkCore;
 using Models.Context;
 using Models.Repositories;
+using Models.Validator;
+using Models.ViewModels;
 
 var builder = WebApplication.CreateBuilder(args);
 ConfigurationManager configuration = builder.Configuration;
 
 
-builder.Services.AddControllers();
+//builder.Services.AddControllers();
+
+//builder.Services.AddControllers()
+//    .AddFluentValidation();
+
+//builder.Services.AddTransient<IValidator<RegisterStudent>, RegisterStudentValidator>();
+
+builder.Services.AddControllers()
+    .AddFluentValidation(option => option.RegisterValidatorsFromAssemblyContaining<RegisterStudentValidator>());
 
 
 builder.Services.AddEndpointsApiExplorer();

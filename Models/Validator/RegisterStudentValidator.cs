@@ -16,15 +16,25 @@ public class RegisterStudentValidator : AbstractValidator<RegisterStudent>
 
         RuleFor(o => o.NationalCode)/*.Cascade(CascadeMode.Stop)*/
             .NotNull().WithMessage("لطفا کد ملی را وارد کنید")
-            .Length(10).WithMessage("تعداد کاراکترها صحیح نیست")
-            .Equal("test");
+            .Length(10).WithMessage("تعداد کاراکترها صحیح نیست");
 
+
+        //RuleFor(o => o.FirstName)
+        //    .NotEmpty()
+        //    .Must(o => o != null && o.StartsWith("h") && o.EndsWith("a"));
+
+        //RuleFor(o => o.LastName)
+        //    .Must(o => o != null && o.StartsWith("h") && o.EndsWith("a"))
+        //    .NotEmpty();
 
         RuleFor(o => o.FirstName)
-            .NotEmpty();
+            .StartAndEndControl("h", "a");
+
+        RuleFor(o => o.LastName)
+            .StartAndEndControl("z", "b");
 
         RuleFor(o => o.RegisterAddress).NotNull()
-            .Must(o=> o?.Count > 0 && o.Count <=2);
+            .Must(o => o?.Count > 0 && o.Count <= 2);
 
         RuleForEach(o => o.RegisterAddress)
             .SetValidator(new RegisterAddressValidator());
@@ -66,3 +76,17 @@ public class RegisterAddressValidator : AbstractValidator<RegisterAddress>
     }
 }
 
+
+public static class CustomeValidator
+{
+    public static IRuleBuilder<T, string?> StartAndEndControl<T>
+        (this IRuleBuilder<T, string?> ruleBuilder, string? start = null, string? end = null)
+        => ruleBuilder.Custom((input, Context) =>
+        {
+            if (start != null && input != null && !input.StartsWith(start))
+                Context.AddFailure($"Must Start With {start}, But You Enter {input[0]}");
+
+            if (end != null && input != null && !input.EndsWith(end))
+                Context.AddFailure($"Must End With {end}, But You Enter {input[^1]}");
+        });
+}

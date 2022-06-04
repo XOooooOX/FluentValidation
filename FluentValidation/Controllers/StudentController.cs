@@ -35,12 +35,12 @@ public class StudentController : ControllerBase
     [HttpPost("Add")]
     public async Task<IActionResult> Add([FromBody] RegisterStudent registerStudent)
     {
-        var validator = new RegisterStudentValidator();
+        //var validator = new RegisterStudentValidator();
 
-        var result = await validator.ValidateAsync(registerStudent);
+        //var result = await validator.ValidateAsync(registerStudent);
 
-        if (!result.IsValid)
-            return BadRequest(result.Errors[0].ErrorMessage);
+        //if (!result.IsValid)
+        //    return BadRequest(result.Errors[0].ErrorMessage);
 
         List<Models.DomainModels.Address> addresses = registerStudent.RegisterAddress
             .Select(o => new Models.DomainModels.Address(
