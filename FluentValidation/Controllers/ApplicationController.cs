@@ -14,10 +14,10 @@ public class ApplicationController : ControllerBase
     protected IActionResult OK()
         => new ApiActionResult(ApiResult.OK(), HttpStatusCode.OK);
 
-    protected IActionResult Error(List<Error> errors, string? invalidField = null)
+    protected IActionResult Error(List<Error> errors)
         => new ApiActionResult(ApiResult.Error(errors), HttpStatusCode.BadRequest);
 
-    protected IActionResult NotFound(List<Error> errors, string? invalidField = null)
+    protected IActionResult NotFound(List<Error> errors)
         => new ApiActionResult(ApiResult.Error(errors), HttpStatusCode.NotFound);
 
     protected IActionResult FromResult<T>(Result<T, List<Error>> result)
