@@ -1,13 +1,14 @@
 ﻿using CSharpFunctionalExtensions;
 using FluentValidation;
-using Models.DomainModels;
+using Models.Repositories;
+using Models.ValueObjects;
 using Models.ViewModels;
 
 namespace Models.Validator;
 
 public class RegisterStudentValidator : AbstractValidator<RegisterStudent>
 {
-    public RegisterStudentValidator()
+    public RegisterStudentValidator(IUnitOfWork unitOfWork)
     {
         //RuleSet(ActionCrud.Add.ToString(), () =>
         //{
@@ -17,8 +18,11 @@ public class RegisterStudentValidator : AbstractValidator<RegisterStudent>
         //CascadeMode = CascadeMode.Stop;
 
         RuleFor(o => o.NationalCode)/*.Cascade(CascadeMode.Stop)*/
-            .NotNull().WithMessage("لطفا کد ملی را وارد کنید")
-            .Length(10).WithMessage("تعداد کاراکترها صحیح نیست");
+            .NotNull()
+            .Length(10)
+            .Must(o => unitOfWork.StudentRepository.ExistByNationalCode(o) == false).WithMessage(Errors.Student.NationalCodeIsTaken().Serialize());
+
+        //Transform(o => o.FirstName, o => (o ?? "").Trim());
 
 
         //RuleFor(o => o.FirstName)
@@ -32,39 +36,39 @@ public class RegisterStudentValidator : AbstractValidator<RegisterStudent>
         //RuleFor(o => o.FirstName)
         //    .StartAndEndControl("h", "a");
 
-        RuleFor(o => o.LastName)
-            .StartAndEndControl("z", "b");
+        //RuleFor(o => o.LastName)
+        //    .StartAndEndControl("z", "b");
 
-        RuleFor(o => o.RegisterAddress).NotNull()
-            .Must(o => o?.Count > 0 && o.Count <= 2);
+        //RuleFor(o => o.RegisterAddress).NotNull()
+        //    .Must(o => o?.Count > 0 && o.Count <= 2);
 
-        RuleForEach(o => o.RegisterAddress)
-            .SetValidator(new RegisterAddressValidator());
+        //RuleForEach(o => o.RegisterAddress)
+        //    .SetValidator(new RegisterAddressValidator());
 
         //RuleFor(o => o.Email)
         //    .NotEmpty()
         //    .EmailAddress();
 
-        RuleFor(o => o.Age)
-            .GreaterThan(18)
-            .LessThan(40);
+        //RuleFor(o => o.Age)
+        //    .GreaterThan(18)
+        //    .LessThan(40);
 
         RuleFor(o => o.FirstName)
-            .NotEmpty().WithMessage("لطفا نام را وارد کنید")
+            .NotEmpty()
             .MustBeValueObject(FirstName.Create);
 
-        When(o => !string.IsNullOrEmpty(o.Phone), () =>
-        {
-            RuleFor(o => o.Phone).NotEmpty().Matches(@"^0(9\d{9})$");
+        //When(o => !string.IsNullOrEmpty(o.Phone), () =>
+        //{
+        //    RuleFor(o => o.Phone).NotEmpty().Matches(@"^0(9\d{9})$");
 
-            RuleFor(o => o.Email).Null();
+        //    RuleFor(o => o.Email).Null();
 
-        }).Otherwise(() =>
-        {
-            RuleFor(o => o.Email).NotEmpty().EmailAddress();
+        //}).Otherwise(() =>
+        //{
+        //    RuleFor(o => o.Email).NotEmpty().EmailAddress();
 
-            RuleFor(o => o.Phone).Null();
-        });
+        //    RuleFor(o => o.Phone).Null();
+        //});
 
     }
 }
@@ -89,15 +93,15 @@ public static class CustomeValidator
         => ruleBuilder.Custom((input, Context) =>
         {
             if (start != null && input != null && !input.StartsWith(start))
-                Context.AddFailure($"Must Start With {start}, But You Enter {input[0]}");
+                Context.AddFailure(Errors.General.ValueIsInvalid().Serialize());
 
             if (end != null && input != null && !input.EndsWith(end))
-                Context.AddFailure($"Must End With {end}, But You Enter {input[^1]}");
+                Context.AddFailure(Errors.General.ValueIsInvalid().Serialize());
         });
 
-    public static IRuleBuilderOptions<T,string?>
-        MustBeValueObject<T,TValueObject>
-        (this IRuleBuilder<T,string?> ruleBuilder, Func<string,Result<TValueObject>> factoryMethod)
+    public static IRuleBuilderOptions<T, string?>
+        MustBeValueObject<T, TValueObject>
+        (this IRuleBuilder<T, string?> ruleBuilder, Func<string, Result<TValueObject, Error>> factoryMethod)
         where TValueObject : ValueObject
     {
         return (IRuleBuilderOptions<T, string>)ruleBuilder.Custom((value, context) =>
@@ -105,10 +109,28 @@ public static class CustomeValidator
             if (string.IsNullOrWhiteSpace(value))
                 return;
 
-            Result<TValueObject> result = factoryMethod(value);
+            Result<TValueObject, Error> result = factoryMethod(value);
 
             if (result.IsFailure)
-                context.AddFailure(result.Error);
+                context.AddFailure(result.Error.Serialize());
         });
+    }
+
+    public static IRuleBuilderOptions<T, TProperty> NotEmpty<T, TProperty>(this IRuleBuilder<T, TProperty> ruleBuilder)
+    {
+        return DefaultValidatorExtensions.NotEmpty(ruleBuilder)
+            .WithMessage(Errors.General.ValueIsRequired().Serialize());
+    }
+
+    public static IRuleBuilderOptions<T, TProperty> NotNull<T, TProperty>(this IRuleBuilder<T, TProperty> ruleBuilder)
+    {
+        return DefaultValidatorExtensions.NotNull(ruleBuilder)
+            .WithMessage(Errors.General.ValueIsRequired().Serialize());
+    }
+
+    public static IRuleBuilderOptions<T, TProperty> Length<T, TProperty>(this IRuleBuilder<T, TProperty> ruleBuilder, int min, int max)
+    {
+        return DefaultValidatorExtensions.NotNull(ruleBuilder)
+            .WithMessage(Errors.General.InvalidLength().Serialize());
     }
 }

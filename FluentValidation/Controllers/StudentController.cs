@@ -1,60 +1,52 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Models.Repositories;
-using Models.Validator;
 using Models.ViewModels;
-using System.Text.RegularExpressions;
-using FluentValidation;
 
 namespace FluentValidationApp.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class StudentController : ControllerBase
+public class StudentController : ApplicationController
 {
-    private IUnitOfWork _unitOfWork;
+    private readonly IUnitOfWork _unitOfWork;
 
     public StudentController(IUnitOfWork unitOfWork)
         => _unitOfWork = unitOfWork;
 
     [HttpGet("GetAll")]
     public async Task<IActionResult> GetAll()
-    => Ok(await _unitOfWork.StudentRepository.GetAll());
+    => OK(await _unitOfWork.StudentRepository.GetAll());
 
     [HttpGet("Get/{id}")]
     public async Task<IActionResult> Get([FromRoute] Guid id)
     {
-        Models.DomainModels.Student? result =
-            await _unitOfWork.StudentRepository.Get(id);
+        var result = await _unitOfWork.StudentRepository.Get(id);
 
-        if (result == null)
+        if (result is null)
             return NotFound();
         else
-            return Ok(result);
+            return OK(result);
     }
 
     [HttpPost("Add")]
     public async Task<IActionResult> Add([FromBody] RegisterStudent registerStudent)
     {
-        //var validator = new RegisterStudentValidator();
+        List<Models.DomainModels.Address> addresses = new();
 
-        //var result = await validator.ValidateAsync(registerStudent);
-
-        //if (!result.IsValid)
-        //    return BadRequest(result.Errors[0].ErrorMessage);
-
-        List<Models.DomainModels.Address> addresses = registerStudent.RegisterAddress
-            .Select(o => new Models.DomainModels.Address(
-                Guid.NewGuid(),
-                o.Name,
-                o.PostalCode,
-                o.City,
-                o.State,
-                o.CompleteAddress))
-            .ToList();
+        if (registerStudent.RegisterAddress is not null)
+            addresses = registerStudent.RegisterAddress
+                .Select(o => new Models.DomainModels.Address(
+                    Guid.NewGuid(),
+                    o.Name,
+                    o.PostalCode,
+                    o.City,
+                    o.State,
+                    o.CompleteAddress))
+                .ToList();
 
         var student = new Models.DomainModels.Student()
         {
-            FirstName = Models.DomainModels.FirstName.Create(registerStudent.FirstName).Value,
+            FirstName = Models.ValueObjects.FirstName.Create(registerStudent.FirstName).Value,
             LastName = registerStudent.LastName,
             Email = registerStudent.Email,
             Gender = registerStudent.Gender,
@@ -69,11 +61,11 @@ public class StudentController : ControllerBase
 
         _unitOfWork.Complete();
 
-        return Ok();
+        return OK();
     }
 
     [HttpDelete("Delete/{id}")]
-    public async Task<ActionResult> Delete([FromRoute] Guid id)
+    public async Task<IActionResult> Delete([FromRoute] Guid id)
     {
         Models.DomainModels.Student? result =
             await _unitOfWork.StudentRepository.Get(id);
@@ -85,7 +77,7 @@ public class StudentController : ControllerBase
 
         _unitOfWork.Complete();
 
-        return Ok();
+        return OK();
     }
 }
 

@@ -1,4 +1,5 @@
 ﻿using Models.Context;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Models.Repositories;
 
@@ -13,12 +14,12 @@ public class UnitOfWork : IUnitOfWork
     private readonly FluentValidationDbContext _context;
     private bool _disposedValue;
 
-    public IStudentRepository StudentRepository { get; }
-    public ICourseRepository CourseRepository { get; }
+    public IStudentRepository StudentRepository { get; init; }
+    public ICourseRepository CourseRepository { get; init; }
 
     public UnitOfWork(FluentValidationDbContext context,
-        IStudentRepository studentRepository,
-        ICourseRepository courseRepository)
+        [NotNull] IStudentRepository studentRepository,
+        [NotNull] ICourseRepository courseRepository)
     {
         _context = context;
         StudentRepository = studentRepository;

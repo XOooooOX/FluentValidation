@@ -1,10 +1,13 @@
-using FluentValidation;
 using FluentValidation.AspNetCore;
+using FluentValidationApp;
+using FluentValidationApp.Controllers;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Models.Context;
 using Models.Repositories;
 using Models.Validator;
-using Models.ViewModels;
+using Models.ValueObjects;
+using System.Net;
 
 var builder = WebApplication.CreateBuilder(args);
 ConfigurationManager configuration = builder.Configuration;
@@ -18,6 +21,10 @@ ConfigurationManager configuration = builder.Configuration;
 //builder.Services.AddTransient<IValidator<RegisterStudent>, RegisterStudentValidator>();
 
 builder.Services.AddControllers()
+    .ConfigureApiBehaviorOptions(option =>
+    {
+        option.InvalidModelStateResponseFactory = ModelStateValidator.ValidateModelState;
+    })
     .AddFluentValidation(option => option.RegisterValidatorsFromAssemblyContaining<RegisterStudentValidator>());
 
 
@@ -42,7 +49,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
+app.UseMiddleware<ExceptionHandler>();
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
@@ -50,3 +57,22 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+
+public class ModelStateValidator
+{
+    public static IActionResult ValidateModelState(ActionContext actionContext)
+    {
+        List<Error> errors = new();
+
+        var modelState = actionContext.ModelState.ToList();
+
+        errors.AddRange(modelState
+            .Where(o => o.Value is not null && o.Value.Errors is not null)
+            .Select(o => Error.Deserialize(o.Value.Errors[0].ErrorMessage)));
+
+        ApiResult result = ApiResult.Error(errors);
+        var apiActionResult = new ApiActionResult(result, HttpStatusCode.BadRequest);
+        return apiActionResult;
+    }
+}
