@@ -8,6 +8,7 @@ using Models.Repositories;
 using Models.Validator;
 using Models.ValueObjects;
 using System.Net;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 ConfigurationManager configuration = builder.Configuration;
@@ -21,6 +22,8 @@ ConfigurationManager configuration = builder.Configuration;
 //builder.Services.AddTransient<IValidator<RegisterStudent>, RegisterStudentValidator>();
 
 builder.Services.AddControllers()
+    .AddJsonOptions(o
+    => o.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles)
     .ConfigureApiBehaviorOptions(option =>
     {
         option.InvalidModelStateResponseFactory = ModelStateValidator.ValidateModelState;
@@ -69,7 +72,7 @@ public class ModelStateValidator
 
         errors.AddRange(modelState
             .Where(o => o.Value is not null && o.Value.Errors is not null)
-            .Select(o => Error.Deserialize(o.Value.Errors[0].ErrorMessage)));
+            .Select(o => Error.Deserialize(o.Value!.Errors[0].ErrorMessage)));
 
         ApiResult result = ApiResult.Error(errors);
         var apiActionResult = new ApiActionResult(result, HttpStatusCode.BadRequest);

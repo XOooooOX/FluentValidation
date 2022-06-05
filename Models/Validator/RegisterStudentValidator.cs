@@ -1,5 +1,6 @@
 ﻿using CSharpFunctionalExtensions;
 using FluentValidation;
+using FluentValidation.Validators;
 using Models.Repositories;
 using Models.ValueObjects;
 using Models.ViewModels;
@@ -17,13 +18,7 @@ public class RegisterStudentValidator : AbstractValidator<RegisterStudent>
 
         //CascadeMode = CascadeMode.Stop;
 
-        RuleFor(o => o.NationalCode)/*.Cascade(CascadeMode.Stop)*/
-            .NotNull()
-            .Length(10)
-            .Must(o => unitOfWork.StudentRepository.ExistByNationalCode(o) == false).WithMessage(Errors.Student.NationalCodeIsTaken().Serialize());
-
         //Transform(o => o.FirstName, o => (o ?? "").Trim());
-
 
         //RuleFor(o => o.FirstName)
         //    .NotEmpty()
@@ -32,30 +27,6 @@ public class RegisterStudentValidator : AbstractValidator<RegisterStudent>
         //RuleFor(o => o.LastName)
         //    .Must(o => o != null && o.StartsWith("h") && o.EndsWith("a"))
         //    .NotEmpty();
-
-        //RuleFor(o => o.FirstName)
-        //    .StartAndEndControl("h", "a");
-
-        //RuleFor(o => o.LastName)
-        //    .StartAndEndControl("z", "b");
-
-        //RuleFor(o => o.RegisterAddress).NotNull()
-        //    .Must(o => o?.Count > 0 && o.Count <= 2);
-
-        //RuleForEach(o => o.RegisterAddress)
-        //    .SetValidator(new RegisterAddressValidator());
-
-        //RuleFor(o => o.Email)
-        //    .NotEmpty()
-        //    .EmailAddress();
-
-        //RuleFor(o => o.Age)
-        //    .GreaterThan(18)
-        //    .LessThan(40);
-
-        RuleFor(o => o.FirstName)
-            .NotEmpty()
-            .MustBeValueObject(FirstName.Create);
 
         //When(o => !string.IsNullOrEmpty(o.Phone), () =>
         //{
@@ -70,6 +41,32 @@ public class RegisterStudentValidator : AbstractValidator<RegisterStudent>
         //    RuleFor(o => o.Phone).Null();
         //});
 
+        RuleFor(o => o.NationalCode)
+            .NotEmpty()
+            .Length(5, 30)
+            .Must(o => unitOfWork.StudentRepository.ExistByNationalCode(o) == false).WithMessage(Errors.Student.NationalCodeIsTaken().Serialize());
+
+        RuleFor(o => o.FirstName)
+            .NotEmpty()
+            .MustBeValueObject(FirstName.Create);
+
+        RuleFor(o => o.LastName)
+            .NotEmpty();
+
+        RuleFor(o => o.RegisterAddress).NotNull()
+            .Must(o => o?.Count > 0 && o.Count <= 2)
+            .WithMessage(Errors.General.ValueIsRequired().Serialize());
+
+        RuleForEach(o => o.RegisterAddress)
+            .SetValidator(new RegisterAddressValidator());
+
+        RuleFor(o => o.Email)
+            .NotEmpty()
+            .EmailAddress();
+
+        RuleFor(o => o.Age)
+            .GreaterThan(18)
+            .LessThan(40);
     }
 }
 
@@ -116,7 +113,7 @@ public static class CustomeValidator
         });
     }
 
-    public static IRuleBuilderOptions<T, TProperty> NotEmpty<T, TProperty>(this IRuleBuilder<T, TProperty> ruleBuilder)
+    public static IRuleBuilderOptions<T, TProperty?> NotEmpty<T, TProperty>(this IRuleBuilder<T, TProperty?> ruleBuilder)
     {
         return DefaultValidatorExtensions.NotEmpty(ruleBuilder)
             .WithMessage(Errors.General.ValueIsRequired().Serialize());
@@ -128,9 +125,35 @@ public static class CustomeValidator
             .WithMessage(Errors.General.ValueIsRequired().Serialize());
     }
 
-    public static IRuleBuilderOptions<T, TProperty> Length<T, TProperty>(this IRuleBuilder<T, TProperty> ruleBuilder, int min, int max)
+    public static IRuleBuilderOptions<T, string> Length<T>(this IRuleBuilder<T, string> ruleBuilder, int exactLength)
     {
-        return DefaultValidatorExtensions.NotNull(ruleBuilder)
+        return DefaultValidatorExtensions.Length(ruleBuilder, exactLength)
+            .WithMessage(Errors.General.InvalidLength().Serialize());
+    }
+
+    public static IRuleBuilderOptions<T, string?> Length<T>(this IRuleBuilder<T, string?> ruleBuilder, int min, int max)
+    {
+        return DefaultValidatorExtensions.Length(ruleBuilder, min, max)
+            .WithMessage(Errors.General.InvalidLength().Serialize());
+    }
+
+    public static IRuleBuilderOptions<T, string?> EmailAddress<T>(this IRuleBuilder<T, string?> ruleBuilder, EmailValidationMode mode = EmailValidationMode.AspNetCoreCompatible)
+    {
+        return DefaultValidatorExtensions.EmailAddress(ruleBuilder, mode)
+            .WithMessage(Errors.General.ValueIsInvalid().Serialize());
+    }
+
+    public static IRuleBuilderOptions<T, TProperty> GreaterThan<T, TProperty>(this IRuleBuilder<T, TProperty> ruleBuilder, TProperty valueToCompare)
+        where TProperty : IComparable<TProperty>, IComparable
+    {
+        return DefaultValidatorExtensions.GreaterThan(ruleBuilder, valueToCompare)
+            .WithMessage(Errors.General.InvalidLength().Serialize());
+    }
+
+    public static IRuleBuilderOptions<T, TProperty> LessThan<T, TProperty>(this IRuleBuilder<T, TProperty> ruleBuilder, TProperty valueToCompare)
+        where TProperty : IComparable<TProperty>, IComparable
+    {
+        return DefaultValidatorExtensions.LessThan(ruleBuilder, valueToCompare)
             .WithMessage(Errors.General.InvalidLength().Serialize());
     }
 }

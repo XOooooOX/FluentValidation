@@ -24,7 +24,7 @@ public class StudentController : ApplicationController
         var result = await _unitOfWork.StudentRepository.Get(id);
 
         if (result is null)
-            return NotFound();
+            return NotFound(id);
         else
             return OK(result);
     }
@@ -62,7 +62,7 @@ public class StudentController : ApplicationController
 
         _unitOfWork.Complete();
 
-        return OK();
+        return OK(student);
     }
 
     [HttpDelete("Delete/{id}")]
@@ -78,7 +78,7 @@ public class StudentController : ApplicationController
 
         _unitOfWork.Complete();
 
-        return OK();
+        return OK(result);
     }
 }
 

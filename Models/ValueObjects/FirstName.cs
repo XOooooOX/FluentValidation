@@ -12,9 +12,6 @@ public class FirstName : ValueObject
 
     public static Result<FirstName, Error> Create([MaybeNull] string? input)
     {
-        //if (string.IsNullOrWhiteSpace(input))
-        //    return Result.Failure<FirstName>($"{nameof(FirstName)} must not be empty");
-
         string firstName = input.Trim();
 
         if (firstName.Length < 5)

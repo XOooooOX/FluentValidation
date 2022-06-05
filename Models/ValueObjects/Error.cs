@@ -38,23 +38,23 @@ public static class Errors
 {
     public static class General
     {
-        public static Error NotFound([MaybeNull] long? id = null)
+        public static Error NotFound([MaybeNull] object? id = null)
         {
             string forId = id == null ? "" : $"For Id{id}";
-            return new Error("1", $"Record Not Found {forId}");
+            return new("1", $"Record Not Found {forId}");
         }
 
         public static Error ValueIsInvalid()
-            => new Error("2", "Value Is Invalid");
+            => new("2", "Value Is Invalid");
 
         public static Error InternalServerError(string error)
-            => new Error("500", error);
+            => new("500", error);
 
         public static Error ValueIsRequired()
-            => new Error("10", "Value Is Required");
+            => new("10", "Value Is Required");
 
         public static Error InvalidLength()
-            => new Error("15", "Length is Invalid");
+            => new("15", "Length is Invalid");
     }
 
     public static class Student
@@ -62,16 +62,16 @@ public static class Errors
         public static Error EmailIsTaken([MaybeNull] string? email)
         {
             string forEmail = email == null ? "" : $"For Id{email}";
-            return new Error("3", $"Email {forEmail} Is Taken");
+            return new("3", $"Email {forEmail} Is Taken");
         }
 
         public static Error NationalCodeIsTaken()
-            => new Error("3", $"NationalCode Is Taken");
+            => new("3", $"NationalCode Is Taken");
 
         public static Error FirstNameMinimumCharacterControl([MaybeNull] int? min = 0)
-            => new Error("4", $"First Name Must Be More Than {min} Character");
+            => new("4", $"First Name Must Be More Than {min} Character");
 
         public static Error FirstNameMaximumCharacterControl([MaybeNull] int? max = 0)
-            => new Error("5", $"First Name Must Be Less Than {max} Character");
+            => new("5", $"First Name Must Be Less Than {max} Character");
     }
 }

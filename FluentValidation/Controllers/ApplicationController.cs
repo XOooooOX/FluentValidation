@@ -17,8 +17,8 @@ public class ApplicationController : ControllerBase
     protected IActionResult Error(List<Error> errors)
         => new ApiActionResult(ApiResult.Error(errors), HttpStatusCode.BadRequest);
 
-    protected IActionResult NotFound(List<Error> errors)
-        => new ApiActionResult(ApiResult.Error(errors), HttpStatusCode.NotFound);
+    protected new IActionResult NotFound(object? id)
+        => new ApiActionResult(ApiResult.Error(Errors.General.NotFound(id)), HttpStatusCode.NotFound);
 
     protected IActionResult FromResult<T>(Result<T, List<Error>> result)
     {

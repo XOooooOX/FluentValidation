@@ -7,7 +7,7 @@ namespace FluentValidationApp.Controllers;
 [ApiController]
 public class CourseController : ControllerBase
 {
-    private IUnitOfWork _unitOfWork;
+    private readonly IUnitOfWork _unitOfWork;
 
     public CourseController(IUnitOfWork unitOfWork)
         => _unitOfWork = unitOfWork;
