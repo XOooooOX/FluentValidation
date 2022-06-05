@@ -50,8 +50,8 @@ public static class Errors
         public static Error InternalServerError(string error)
             => new("500", error);
 
-        public static Error ValueIsRequired()
-            => new("10", "Value Is Required");
+        public static Error ValueIsRequired(string propertyName)
+            => new("10", $"{propertyName} Is Required");
 
         public static Error InvalidLength()
             => new("15", "Length is Invalid");
@@ -61,12 +61,15 @@ public static class Errors
     {
         public static Error EmailIsTaken([MaybeNull] string? email)
         {
-            string forEmail = email == null ? "" : $"For Id{email}";
+            string forEmail = email == null ? "" : $"{email}";
             return new("3", $"Email {forEmail} Is Taken");
         }
 
-        public static Error NationalCodeIsTaken()
-            => new("3", $"NationalCode Is Taken");
+        public static Error NationalCodeIsTaken([MaybeNull] string? nationalCode)
+        {
+            string forNationalCode = nationalCode == null ? "" : $"{nationalCode}";
+            return new("3", $"NationalCode {forNationalCode} Is Taken");
+        }
 
         public static Error FirstNameMinimumCharacterControl([MaybeNull] int? min = 0)
             => new("4", $"First Name Must Be More Than {min} Character");

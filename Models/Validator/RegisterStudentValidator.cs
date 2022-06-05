@@ -11,6 +11,7 @@ public class RegisterStudentValidator : AbstractValidator<RegisterStudent>
 {
     public RegisterStudentValidator(IUnitOfWork unitOfWork)
     {
+        this.
         //RuleSet(ActionCrud.Add.ToString(), () =>
         //{
         //    //RuleFor(o => o.Phone).NotEmpty().Matches(@"^0(9\d{9})$");
@@ -44,7 +45,8 @@ public class RegisterStudentValidator : AbstractValidator<RegisterStudent>
         RuleFor(o => o.NationalCode)
             .NotEmpty()
             .Length(5, 30)
-            .Must(o => unitOfWork.StudentRepository.ExistByNationalCode(o) == false).WithMessage(Errors.Student.NationalCodeIsTaken().Serialize());
+            .Must(o => unitOfWork.StudentRepository.ExistByNationalCode(o) == false)
+            .WithMessage(o => Errors.Student.NationalCodeIsTaken(o.NationalCode).Serialize());
 
         RuleFor(o => o.FirstName)
             .NotEmpty()
@@ -55,7 +57,7 @@ public class RegisterStudentValidator : AbstractValidator<RegisterStudent>
 
         RuleFor(o => o.RegisterAddress).NotNull()
             .Must(o => o?.Count > 0 && o.Count <= 2)
-            .WithMessage(Errors.General.ValueIsRequired().Serialize());
+            .WithMessage(o => Errors.General.ValueIsRequired(nameof(o.RegisterAddress)).Serialize());
 
         RuleForEach(o => o.RegisterAddress)
             .SetValidator(new RegisterAddressValidator());
@@ -115,14 +117,18 @@ public static class CustomeValidator
 
     public static IRuleBuilderOptions<T, TProperty?> NotEmpty<T, TProperty>(this IRuleBuilder<T, TProperty?> ruleBuilder)
     {
+        var propertyName = DefaultValidatorOptions.Configurable(ruleBuilder).PropertyName;
+
         return DefaultValidatorExtensions.NotEmpty(ruleBuilder)
-            .WithMessage(Errors.General.ValueIsRequired().Serialize());
+            .WithMessage(Errors.General.ValueIsRequired(propertyName).Serialize());
     }
 
     public static IRuleBuilderOptions<T, TProperty> NotNull<T, TProperty>(this IRuleBuilder<T, TProperty> ruleBuilder)
     {
+        var propertyName = DefaultValidatorOptions.Configurable(ruleBuilder).PropertyName;
+
         return DefaultValidatorExtensions.NotNull(ruleBuilder)
-            .WithMessage(Errors.General.ValueIsRequired().Serialize());
+            .WithMessage(Errors.General.ValueIsRequired(propertyName).Serialize());
     }
 
     public static IRuleBuilderOptions<T, string> Length<T>(this IRuleBuilder<T, string> ruleBuilder, int exactLength)
