@@ -62,7 +62,7 @@ public static class Errors
         public static Error EmailIsTaken([MaybeNull] string? email)
         {
             string forEmail = email == null ? "" : $"{email}";
-            return new("3", $"Email {forEmail} Is Taken");
+            return new("344", $"Email {forEmail} Is Taken");
         }
 
         public static Error NationalCodeIsTaken([MaybeNull] string? nationalCode)

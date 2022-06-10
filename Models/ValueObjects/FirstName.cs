@@ -12,7 +12,7 @@ public class FirstName : ValueObject
 
     public static Result<FirstName, Error> Create([MaybeNull] string? input)
     {
-        string firstName = input.Trim();
+        string firstName = input!.Trim();
 
         if (firstName.Length < 5)
             return Errors.Student.FirstNameMinimumCharacterControl(5);

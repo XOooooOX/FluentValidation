@@ -16,6 +16,7 @@ namespace FluentValidationApp
 
         public static ApiResult Error(List<Error>? errors)
             => new(null, errors);
+
         public static ApiResult Error(Error error)
             => new(null, new List<Error>() { error });
     }

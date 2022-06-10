@@ -31,7 +31,7 @@ public sealed class ExceptionHandler
     {
         string errorMessage = _env.IsProduction() ? "Internal Server Error" : "Exception: " + exception.Message;
         var error = Errors.General.InternalServerError(errorMessage);
-        var apiResult = ApiResult.Error(new List<Error>() { error });
+        var apiResult = ApiResult.Error(error);
         var result = JsonSerializer.Serialize(apiResult);
         context.Response.ContentType = "application/json";
         context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
