@@ -26,5 +26,8 @@ public abstract class GenericRepository<T> : IGenericRepository<T> where T : cla
 
     public void Update(T entity)
         => _context.Set<T>().Update(entity);
+
+    public IAsyncEnumerable<T> AsAsyncEnumerable()
+        => _context.Set<T>().AsAsyncEnumerable();
 }
 

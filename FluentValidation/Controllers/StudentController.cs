@@ -1,4 +1,4 @@
-﻿using CSharpFunctionalExtensions;
+﻿
 using Microsoft.AspNetCore.Mvc;
 using Models.Repositories;
 using Models.ViewModels;
@@ -79,6 +79,13 @@ public class StudentController : ApplicationController
         _unitOfWork.Complete();
 
         return OK(result);
+    }
+
+    [HttpGet("Test")]
+    public async IAsyncEnumerable<Models.DomainModels.Student> Test()
+    {
+        await foreach (var item in _unitOfWork.StudentRepository.AsAsyncEnumerable())
+            yield return item;
     }
 }
 
